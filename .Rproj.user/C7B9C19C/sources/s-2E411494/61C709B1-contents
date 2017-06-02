@@ -1,0 +1,9 @@
+library(wordcloud2)
+
+df <- read.csv("~/Downloads/words.csv")
+
+  wordcloud2(demoFreq, figPath = figPath)
+
+ 
+
+figPath = system.file("examples/t.png",package = "wordcloud2")

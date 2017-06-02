@@ -1,0 +1,152 @@
+---
+title: "Statistical Learning Survey"
+author: "Abraham Neuwirth"
+date: "May 29, 2017"
+output: 
+  bookdown::pdf_document2:
+     includes:
+      in_header: preamble.tex
+bibliography: bibliography.bib
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Introduction
+
+Christopher Bishop [@pattern_recognition] in his seminal book "Pattern Recognition and Machine Learning", introduces the field of statistical learning with a classical story:
+
+> [T]he extensive astronomical observations of Tycho Brahe in the 16th century allowed Johannes Kepler to discover the empirical laws of planetary motion, which in turn provided a springboard for the development of classical
+mechanics.
+
+It's the archtype of statistical learning success stories. Lot's of data, brilliant minds, and a model to illuminate and explain it all.
+
+# Data Representation
+
+## Vectors
+
+## Matrices
+
+## Tensors
+
+# Supervised Learning
+
+```{lemma}
+This is a lemma
+```
+
+## Least-Squares Regression
+
+## Support Vector Machines
+
+# Unsupervised Learning
+
+## Classification
+
+## Naive Bayes
+
+## K-Nearest Neighbors
+
+# Regularlization
+Overfitting is a problem. regularlization penalizes biggest predictors. "Regularization can be accomplished by restricting the hypothesis space $\mathcal {H}$" 
+
+## Tikhonov regularization (Ridge Regression)
+
+
+## Lasso Regression
+
+
+## Principal Components
+Dimensionality reduciton
+
+# Reinforcment Learning
+
+# Deep Learning
+
+This is a level 1 heading
+
+
+
+## Level 2
+
+Blah blah [se also @islr ch. 1] and @eslr.
+
+### equations
+This s an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. See equation \@ref(eq:sum) there's also \@ref(eq:sum2)
+
+\begin{equation} 
+  \sum_{i}^{x}5+1
+  (\#eq:sum)
+\end{equation} 
+
+
+\begin{equation} 
+  \sum_{i}^{x}5+5
+  (\#eq:sum2)
+\end{equation} 
+
+### Level 4
+
+```{theorem}
+Here is A theorem.
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure,  echo=FALSE, fig.cap="test a caption"}
+library(ggplot2)
+ggplot(pressure, aes(temperature, pressure)) + geom_point()
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk \@ref(fig:pressure) to prevent printing of the R code that generated the plot. @pattern_recognition
+
+also, lets put this in here
+
+\begin{equation} 
+\begin{split}
+\mathrm{Var}(\hat{\beta}) & =\mathrm{Var}((X'X)^{-1}X'y)\\
+ & =(X'X)^{-1}X'\mathrm{Var}(y)((X'X)^{-1}X')'\\
+ & =(X'X)^{-1}X'\mathrm{Var}(y)X(X'X)^{-1}\\
+ & =(X'X)^{-1}X'\sigma^{2}IX(X'X)^{-1}\\
+ & =(X'X)^{-1}\sigma^{2}
+\end{split}
+(\#eq:var-beta)
+\end{equation} 
+
+
+and now lets referene \@ref(eq:var-beta) for god sake
+Note that the `echo = FALSE` parameter was added to the code chunk \@ref(fig:pressure) to prevent printing of the R code that generated the plot.
+
+Note that the `echo = FALSE` parameter was added to the code chunk \@ref(fig:pressure) to prevent printing of the R code that generated the plot.
+
+Note that the `echo = FALSE` parameter was added to the code chunk \@ref(fig:pressure) to prevent printing of the R code that generated the plot.
+Note that the `echo = FALSE` parameter was added to the code chunk \@ref(fig:pressure) to prevent printing of the R code that generated the plot.
+
+## level  chapeter
+
+fdsfdsf sdf
+fsd f
+sdf 
+sd
+f 
+sf
+
+# let's try  an ew cahpeter 
+
+\begin{equation} 
+\begin{split}
+\mathrm{Var}(\hat{\beta}) & =\mathrm{Var}((X'X)^{-1}X'y)\\
+ & =(X'X)^{-1}X'\mathrm{Var}(y)((X'X)^{-1}X')'\\
+ & =(X'X)^{-1}X'\mathrm{Var}(y)X(X'X)^{-1}\\
+ & =(X'X)^{-1}X'\sigma^{2}IX(X'X)^{-1}\\
+ & =(X'X)^{-1}\sigma^{2}
+\end{split}
+(\#eq:var-gamma)
+\end{equation} 
+trterter \@ref(eq:var-gamma)
+
+# References
