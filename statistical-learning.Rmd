@@ -12,6 +12,9 @@ bibliography: bibliography.bib
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=4, fig.height=4)
+library(tidyverse)
+theme_set(theme_minimal())
 ```
 # Introduction
 
@@ -36,8 +39,60 @@ It's the archtype of statistical learning success stories. Lot's of data, brilli
 This is a lemma
 ```
 
-## Least-Squares Regression
+## Linear Regression
 
+Of the most simplest and common statistical learning methods, linear regression is the most common. It is also one of the oldest, having been discovered [@priceonomics] independently by Adrien-Marie Legendre in 1805 [@legendre], and then again by Carl Friedrich Gauss in 1809 [@guass].
+
+In the most simplest terms, the objective of a regression is to find the best line to approxiamte a given data set consisting of many points $(x_i, y_i)$, where $x_i$ is the independent variable and $y_i$ is the dependednt variable. 
+
+The objective function is to find estimated values for x, such that the distance between the actual $y$ and $\hat y$ is mimimized. More formally:
+
+```{definition}
+A residual $r_i$ is the difference between the actual value of the dependent variable and the the value predicted by the model such that 
+$r_i = y_i - f(x_i, \beta)$
+```
+The least squares method optimizes the sum of the squares of the residuals: 
+$$S = \sum_{i=1}^{n}r_i^2$$
+
+
+As an example, we'll use the data from @mtcars to illust
+
+```{r raw-data, echo=F, fig.cap="the data"}
+
+mtcars %>% 
+  ggplot(aes(x = mpg, y = disp)) + 
+  geom_point() 
+
+```
+
+Now, the regression draws a straight line through the points \@ref(fig:ols-regression) ok
+
+
+```{r ols-regression, echo=FALSE, fig.cap="regression"}
+
+mtcars %>% 
+  ggplot(aes(x = mpg, y = disp)) + 
+  geom_point() +
+  geom_smooth(method = "lm", se = F)
+
+```
+
+
+
+```{r residuals, echo=F, warning=F, fig.cap="residuals"}
+
+lm(disp ~ mpg, data = mtcars) %>% 
+  broom::augment() %>% 
+  ggplot(aes(x = mpg, y = disp)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F) +
+  geom_point(aes(y = .fitted), shape = 1) + 
+  geom_segment(aes(xend = mpg, yend = .fitted)) 
+
+```
+
+The form of regression published by Legendre and Gauss was what is now called Least Squares regression. 
+ 
 ## Support Vector Machines
 
 # Unsupervised Learning
