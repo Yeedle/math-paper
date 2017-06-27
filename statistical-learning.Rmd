@@ -14,8 +14,12 @@ bibliography: bibliography.bib
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.width=4, fig.height=4)
 library(tidyverse)
+library(scatterplot3d)
 theme_set(theme_minimal())
 ```
+
+\pagebreak
+
 # Introduction
 
 Christopher Bishop [@pattern_recognition] in his seminal book "Pattern Recognition and Machine Learning", introduces the field of statistical learning with a classical story:
@@ -23,49 +27,51 @@ Christopher Bishop [@pattern_recognition] in his seminal book "Pattern Recogniti
 > [T]he extensive astronomical observations of Tycho Brahe in the 16th century allowed Johannes Kepler to discover the empirical laws of planetary motion, which in turn provided a springboard for the development of classical
 mechanics.
 
-It's the archtype of statistical learning success stories. Lot's of data, brilliant minds, and a model to illuminate and explain it all.
+It's the archetype of statistical learning success stories. Lots of data, brilliant minds, and a model to illuminate and explain it all.
 
-# Data Representation
+Statistical learning is the study of using observed data to predict how similar data will behave under similar circumstances. The predictions usually take on one of two forms. The first, called regression, is when these statistical methods are used to predict a numerical value. The second is classification which is a catch-all term for predictions that are of a categorical nature, not numeric. Classification is used both to classify data points into a set of predefined groups as well as to cluster data points into disparate groups discovered by using the statistical learning methods on observed data.
 
-## Vectors
+In general, statistical learning methods can be divided into two groups: _supervised_ and _unsepervised_. Supervised learning generally refers to constructing (or "training") a model with both observed input and output so that when given new input, the model can predict the output. Unsupervised learning, on the other hand, refers to models that are not given any outputs, but only inputs. The role of the model is to discover the classes that divide the data points, or the relationship between various data points, using various statistical techniques.
 
-## Matrices
 
-## Tensors
+While the predictions themselves usually need to be computed by a machine (hence the term "machine learning" that is often used to describe the field), the theory behind it relies on the combination of several mathematical fields such as statistics, probability, linear algbera, complexity theory, and more. Many (if not most) of the methods used were discovered long before machines existed, and exploring their mathematical underpinnings leads to the discovery of new and improved statistical learning tools. 
 
-# Supervised Learning
+# Regression
 
-```{lemma}
-This is a lemma
-```
+The oldest and most commonly used form of statisical learning methods is regression. Regression is the foundation for many supervised learning methods. Supervised learning are classes of problems were we're given data points $y_i$ and $x_i$, and the task is usually to find a function $f(x) = y$. The role of the function is that $\hat y$ needs to be as close to $y_i$ as possible.
+
+Stated mathematically, if we have for example $y = \beta_0 + \beta_1x$ where $\beta_0$ and $\beta_1$ are unknown, we can approximate it with known values, such that $y = \beta_0 + \beta_1 x+\epsilon$. Of course, in practice $\epsilon$ is unknown, but regression focuses on methods to reduce $\epsilon$ as much as possible.
 
 ## Linear Regression
 
-Of the most simplest and common statistical learning methods, linear regression is the most common. It is also one of the oldest, having been discovered [@priceonomics] independently by Adrien-Marie Legendre in 1805 [@legendre], and then again by Carl Friedrich Gauss in 1809 [@guass].
+One of the most simplest and common statistical learning methods is linear regression. It is also one of the oldest, having been discovered [@priceonomics] independently by Adrien-Marie Legendre in 1805 [@legendre], and then again by Carl Friedrich Gauss in 1809 [@gauss].
 
-In the most simplest terms, the objective of a regression is to find the best line to approxiamte a given data set consisting of many points $(x_i, y_i)$, where $x_i$ is the independent variable and $y_i$ is the dependednt variable. 
+In the most simplest terms, the objective of a regression is to find the best line to approximate a given data set consisting of many points $(x_i, y_i)$, where $x_i$ is the independent variable (also caled predictor, input, or feature) and $y_i$ is the dependent variable (also called outcome or prediction). 
 
-The objective function is to find estimated values for x, such that the distance between the actual $y$ and $\hat y$ is mimimized. More formally:
+The objective function is to find estimated values for x, such that the distance between the actual $y$ and $\hat y$ is minimized. More formally:
 
 ```{definition}
 A residual $r_i$ is the difference between the actual value of the dependent variable and the the value predicted by the model such that 
 $r_i = y_i - f(x_i, \beta)$
 ```
 The least squares method optimizes the sum of the squares of the residuals: 
-$$S = \sum_{i=1}^{n}r_i^2$$
+\begin{equation}
+S = \sum_{i=1}^{n}r_i^2
+(\#eq:sum-of-squares)
+\end{equation}
 
-
-As an example, we'll use the data from @mtcars to illust
+As an example, we'll use data from @mtcars to illustrate how regression finds a line through the data by minimizing an objective function. By visually inspecting the data (figure \@ref(fig:raw-data)), we can see that it slopes downward at an approximate rate of $-0.05$. 
 
 ```{r raw-data, echo=F, fig.cap="the data"}
 
 mtcars %>% 
   ggplot(aes(x = mpg, y = disp)) + 
-  geom_point() 
+  geom_point() +
+  labs(x = "x", y ="y")
 
 ```
 
-Now, the regression draws a straight line through the points \@ref(fig:ols-regression) ok
+A linear regression reveals a slope of $-0.04122$ with a y-intercept of $29.59985$. Adding the line to the data we can see how the regression draws a straight line through the points (figure \@ref(fig:ols-regression)).
 
 
 ```{r ols-regression, echo=FALSE, fig.cap="regression"}
@@ -73,10 +79,10 @@ Now, the regression draws a straight line through the points \@ref(fig:ols-regre
 mtcars %>% 
   ggplot(aes(x = mpg, y = disp)) + 
   geom_point() +
-  geom_smooth(method = "lm", se = F)
+  geom_smooth(method = "lm", se = F) +
+  labs(x = "x", y ="y")
 
 ```
-
 
 
 ```{r residuals, echo=F, warning=F, fig.cap="residuals"}
@@ -87,24 +93,508 @@ lm(disp ~ mpg, data = mtcars) %>%
   geom_point() + 
   geom_smooth(method = "lm", se = F) +
   geom_point(aes(y = .fitted), shape = 1) + 
-  geom_segment(aes(xend = mpg, yend = .fitted)) 
+  geom_segment(aes(xend = mpg, yend = .fitted)) +
+  labs(x = "x", y ="y")
 
 ```
 
-The form of regression published by Legendre and Gauss was what is now called Least Squares regression. 
+The form of regression published by Legendre and Gauss was what is now called Least Squares regression. For one varialbe, what we're trying to find is 
+
+\begin{equation}
+\hat y = \beta_0 + \beta_1 x
+\end{equation}
+
+where $\beta_0$ is the y-intercept of the line, $\beta_1$ the slope, $x$ the independent variable (also commonly called the predictor), and $\hat y$ the estimated $y$. To find that, we need to find the line that minimizes the sum of squares of the residuals (formula \@ref(eq:sum-of-squares)). With calculus it can be derived that 
+
+\begin{equation}
+\beta_1 = {\sum_{i=1}^n (x_i - \bar x)(y_i - \bar y) \over \sum_{i=1}^n(x_i-\bar x)^2}
+\end{equation}
+
+and 
+
+
+\begin{equation}
+\beta_0 = \bar y - \beta_1\bar x
+\end{equation}
  
-## Support Vector Machines
+where $\bar x$ is simply the mean of all observed predictors and $\bar y$ are simply the mean value of all observed outcomes. 
 
-# Unsupervised Learning
+## Multiple Linear Regression
 
-## Classification
+Simple linear regression can be used to predict the outcome based on a single predictor. But what if we had multiple independet variables which we would like to use to predict the outcome? As an example, using again data from @mtcars, we can use the independent variables $x_1$ and $x_2$ to construct a linear plane in 3 dimensions to predict $\hat y$ as depicted in figure \@ref(fig:threed).
+
+```{r threed, echo=F, warning=F, fig.cap="two independent variables"}
+model <- lm(disp ~ mpg+wt, mtcars) 
+
+s3d <- scatterplot3d(mtcars$mpg,  mtcars$wt, mtcars$disp, pch=16, type = "h" , xlab = expression(x[1]), ylab = expression(x[2]), zlab = "y")
+
+s3d$plane3d(model)
+```
+
+In this case we need to find not the line but the plane that minimizes the squared error. With higher dimensional data, our goal is to find a hyperplane that accomplishes the same thing. In such a case we need to use multiple linear regression.
+
+Note that with simple linear regression, all the values used to build the model were scalars, eaither means or sums of the observed values. However, with multiple linear regression such a representation would not suffice. Instead, we represent our data as a matrix, with each column in the matrix representing all observed values for an independent variable, and each row representing a complete singular observation.
+
+As an example, consider a simple linear regression with just one predictor:
+
+\begin{equation}
+\hat y_i = \beta_0 + \beta_1 x_i \quad \textrm{for } i = 1, 2, \dots, n
+\end{equation}
+
+In practice, this results in $n$ equations, as follows:
+
+\begin{align}
+\begin{split}
+\hat y_1 &= \beta_0 + \beta_1 x_1 \\
+\hat y_2 &= \beta_0 + \beta_1 x_2 \\
+  &\vdots \\
+\hat y_n &= \beta_0 + \beta_1 x_n
+\end{split}
+\end{align}
+
+It is immediatly obvious that a more convenient representation of this data is in matrix form, where we can use matrix multiplication to get $\hat y_i$ for $i = 1, 2, \dots, n$:
+
+\begin{equation}
+\begin{bmatrix}
+\hat y_1 \\
+\hat y_2 \\
+\vdots \\
+\hat y_n
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & x_1 \\
+1 & x_2 \\
+\vdots & \vdots \\
+1 & x_n
+\end{bmatrix}
+\begin{bmatrix}
+\beta_0 \\
+\beta_1
+\end{bmatrix}
+\end{equation}
+
+With the matrix representation, we can just write:
+
+\begin{equation}
+\hat Y = X\beta
+\end{equation}
+
+where $\hat Y$ is the outcome matrix, $X$ the predictor matrix, and $\beta$ the matrix of betas. This can now be generalized easily to as many predictos as we want. If our predictive model looks as follows:
+
+\begin{equation}
+\hat y =  \beta_0 + \beta_1 x_1 +\beta_2 x_2 + \dots + \beta_k x_k
+\end{equation}
+
+where each $x_i$ represents the column vector of one of the $k$ independent variables, we can represent that as a matrix multiplication:
+
+\begin{equation}
+\begin{bmatrix}
+\hat y_1 \\
+\hat y_2 \\
+\vdots \\
+\hat y_n
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & x_{1,1} & x_{1,2} & \dots & x_{1, k} \\
+1 & x_{2,1} & x_{2,2} & \dots & x_{2, k} \\ 
+\vdots & \vdots & \vdots & \vdots & \vdots \\
+1& x_{n,1} & x_{n,2} & \dots & x_{n, k} \\
+\end{bmatrix}
+\begin{bmatrix}
+\beta_0 \\
+\beta_1 \\
+\beta_2 \\
+\vdots \\
+\beta_k
+\end{bmatrix} = \hat Y = X\beta
+\end{equation}
+
+Finding the line (or plane, or hyperplane) that minimizes the least squared error is now a systems of linear equations, where we need to find a vector of appropriate $\beta$s. It can be shown that formula \@ref(eq:lse-matrix) finds the estimates for coefficients for all the predictors that minimizes the squared errors.
+
+\begin{equation}
+(X'X)^{-1}X'Y = 
+\begin{bmatrix}
+\beta_0 \\
+\beta_1 \\
+\beta_2 \\
+\vdots \\
+\beta_k
+\end{bmatrix}
+(\#eq:lse-matrix)
+\end{equation}
+
+### Categorical features {#categorical}
+
+So far we've only discussed using numerical predictors in the regression model. But what if we have categorical data which we would like to include in the model? For example, in a model that predicts income based on various socioeconomic data, we might want to include gender or race as a predictor. In order to use categorical features with regression, the values need to be turned into numerical features first. To accomplish that, a dummy vector needs to be appended to the feature matrix. If the categorical feature is binary, one vector suffices. The dummy variable, $D_1$ will take on the value of 0 or 1. If the feature is not binary, multiple dummy variables will be needed. In general, for a feature with $k$ options, $k-1$ dummy variables will be needed.
+
+The dummy variable can be added to the model in two ways. The first one is if the dummy vector is added to the predictor matrix $Y$ as is as another predictor. In that case, the only affect the dummy variable will have will be to change the intercept based on the binary value of the dummy variably. The second way it can be added to the model is to have it interact with another, numerical, predictor. In that case, the result of the dummy variable will be to shift the slope of the numerical predictor it is multiplied by.
+
+## Generalized Regression
+
+Linear regression makes two important restriction on the nature of the model it produces. The first one is that each predictor is independent from all the other predictors. The second restriction is that the model needs to be linear.
+
+We've already shown (section \@ref(categorical)) that the second restriction can be lifted, by having one predictor interact with another predictor. In other words, instead of the traditional linear model
+
+\begin{equation}
+\hat Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2
+\end{equation}
+
+we can instead multiply individual predictors by each other to get the interaction effect two (or more) predictors might have on each other:
+
+\begin{equation}
+\hat Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta3 X_1 X_2 
+\end{equation}
+
+The second restriction of linearity can be relaxed by raising the predictors to a power. For example, if we look again at figure \@ref(fig:raw-data) we might notice that a quadratic formula might fit the data better. Previously, our model was linear in the coefficients and the predictors:
+
+\begin{equation}
+\hat y = \beta_0 + \beta_1 x
+\end{equation}
+
+But if we raise the predictor to the power of two we might get a better fit as illustrated in figure \@ref(fig:quadratic). For the quadratic fit, the formula looks as follows:
+
+\begin{equation}
+\hat y = \beta_0 + \beta_1 x + \beta_2 x^2
+\end{equation}
+
+```{r quadratic, fig.cap="linear and non-linear regression", echo=F}
+ggplot(mtcars, aes(mpg, disp)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F, aes(color ="linear")) +
+  geom_smooth(method = "lm", formula = y ~ x + I(x^2), se =F, aes(color = "quadratic")) +
+  labs(x = "x", y = "y", color = "") +
+  theme(legend.position = c(.8, .9))
+```
+
+Indeed, if we compare the sum of squared errors of the linear fit (figure \@ref(fig:residuals)) with the sum of squared errors produced by the quadratic fit (figure \@ref(fig:compare-residuals)), we see that the quadratic fit minimizes the error more than the linear fit does. 
+
+```{r compare-residuals, echo = F, warning=F, fig.cap="Residuals of the quadratic fit"}
+lm(disp ~ mpg + I(mpg^2), mtcars) %>%
+  broom::augment() %>%
+  ggplot(aes(mpg, disp)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x + I(x^2), se =F) +
+  geom_point(aes(y = .fitted), shape = 1) +
+  geom_segment(aes(xend = mpg, yend = .fitted)) +
+  labs(x = "x", y = "y") 
+```
+
+In reality however, the regression is still linear. The reason it produces a non-linear fit is because we transformed one of the predictors by raising it to the power of 2. Other commonly used transformations of predictors are the log and the exponential functions among many other possible transformation functions.
+
+## Loss/Objective Functions
+
+So far we have looked at regression and the measure of its efficiency in terms of squared error. That is, our goal in regression is to find the line that minimizes the sum of the squared differences between the actual $y$ and the predicted $\hat y$ (formula (\@ref(eq:sum-of-squares)).
+
+More formally, we can define it as a loss function.
+
+
+```{definition}
+Given a prediction $\hat y$ and an actual value $y$, a loss function $\ell(y, \hat y)$ measures the divergence of the two. 
+```
+
+The goal of a good statistical learning method is to minimize a loss function in an efficient matter (in terms of complexity theory). The Square loss function that we have been using so far, commonly called $\ell_2$ loss, while most commonly used, suffers from several downsides. Most notably, since it relies on squared error, it is not robust. Like the mathematical mean, a few extreme outliers can strongly influence the result in unwanted ways. The reason it is most commonly used is because it's easily differentiably, thus allowing for stable solutios. In other words, since the regression parameters are continous functions of the data, a small change in the data will always produce only a small change in the regression line.
+
+
+### $\ell_2$ 
+
+While $\ell_1$ is the most commonly used loss function, it has its downsides, most notably it is not robust (i.e., it is sensitive to outliers). What would be an alternative loss function?
+
+In regression the most simplest loss function would be the residual itself:
+
+\begin{equation}
+r = y - \hat y
+\end{equation}
+
+The loss function which we would then want to minimize would be what is commonly called $\ell_2$ regularlization or the Laplace loss function, and it takes the following form
+
+\begin{equation}
+S = \sum_{i=1}^{n}|r_i|
+(\#eq:sum-of-absolute-residuals)
+\end{equation}
+
+The sum of least absolute errors has the benefit of being robust: like the mathematical median, it is not easily influenced by outliers in the data. However, it is not as easily differentiable as $\ell_1$, and it is not stable: Small changes in the data can move the regression solution to a configuration where minimizing $\ell_2$ can produces more than one solution or has a vastly different slope.
+
+### Huber Loss function
+
+The Huber loss function seeks to combine the benefits of both $\ell_1$ and $\ell_2$ loss functions. Presented by @hubber, the loss function is defined as follows:
+
+\begin{equation}
+S = \sum_{i=1}^{n}{
+\begin{cases}
+   r^2 \quad \textrm{for } |r| \leq \delta \\
+   |r| \quad \textrm{otherwise}
+   \end{cases}
+   }
+(\#eq:hubber)
+\end{equation}
+
+where $\delta$ is defined as a small non-zero value. Using the Huber loss function, we get a quadratic for small residuals so that the function is differentiable and stable, but for larger residuals we get a linear function so that the loss function is robust and not sensitive to outliers.
+
+A variant of the Huber loss function is the pseudo-Huber loss function which is a smooth approximation of Huber, and it ensures continous derivatives for all degrees:
+
+\begin{equation}
+S = \sum_{i=1}^{n}{\delta^2(\sqrt{1+(r/\delta)^2}-1)}
+\end{equation}
+
+This function approximates $r^2/2$ for small values of $r$ but it approaches a straight line with slope $\delta$ as values of $r$ approach infinity.
+
+# Classification
+
+So far we have only examined statistical models that give numerical outcomes. What about predicting categorical or qualitative outcomes, or as they are often called, classes? Such types of problems are called classification problems and there are several statistical methods that deal with such type of problems. As an example, using data once again from @mtcars, suppose we have two groups in our data (figure \@ref(fig:groups)), can we predict the class of each data point using predictors such as $x$ and $y$ in this case? A theoretical classifier might find a division between the two groups such as the one in figure \@ref(fig:classified-groups), where each data point that is above the line is in group a while each data point below it is in group b.
+
+
+```{r groups,echo=F, fig.cap="The raw data"}
+ggplot(mtcars, aes(mpg, disp, color = factor(vs))) + 
+  geom_point() +
+  labs(x ="x", y = "y", color = "groups") +
+  scale_color_discrete(labels = c("group a", "group b")) +
+  guides(color = guide_legend(override.aes = list(size = 3))) +
+  theme(legend.position = c(.8, .9)) 
+```
+
+
+```{r classified-groups,echo=F, fig.cap="A theoretical classification"}
+ggplot(mtcars, aes(mpg, disp, color = factor(vs))) + 
+  geom_point() +
+  labs(x ="x", y = "y", color = "groups") +
+  scale_color_discrete(labels = c("group a", "group b")) +
+  guides(color = guide_legend(override.aes = list(size = 3))) +
+  theme(legend.position = c(.8, .9)) +
+  geom_abline(slope = 10, intercept = 70)
+```
+
+## Logistic Regression
+
+One of the most popular methods for classification is logistic regression. The biggest obstacle in applying regression to categorical outcomes is in how to encode the different classes in the mathematical formula. Many times there is no inherent ordering to the different classes (for example, genders have no inherent ordering and it makes as much sense to encode male as 1 and female as 0 as the opposite), and even when there is it is not necessarily true that the classes are equally distant from each other. Even in the case of numerical outcomes, such as age, we might not be able to use regression if the outcome does not make sense. For example, if we're trying to predict age, what does it mean if the intercept is a negative value? Or how do we interpert a prediction of an unreasonably old age?
+
+Therefore, instead of predicting the value itself, logistic regression predicts probabilities of classes. In the case of a binary class where the question is simply whether a data point falls in a class or not, we can model the regression to output a value between 0 and 1, where anything below .5 will be interpreted to mean that the data point does not fall in the class and everything above it will be interpreted as belonging to the class, or vice versa. Obviosuly, given that we're interpreting the output values as probabilities, the closer they are to 0 or 1, the more certain we are with the classification.
+
+### Simple Logistic Regression
+
+To transform our categorical results, we use the logistic function, also known as the sigmoid curve because of its S shape [@verhulst]:
+
+\begin{align}
+\begin{split}
+f(x) &= {1\over 1+x^{-x}} \\
+&= {e^x \over 1 + e^x}
+\end{split}
+\end{align}
+
+How do we use this for modeling the probabilites of a binary outcome? Let's first consider the simple case of one predictor. Replacing $x$ in the logistic function with our simple linear regression equation $\beta_0 + \beta_1x$ we get:
+
+\begin{equation}
+p(X) = {e^{\beta_0+\beta_1 X} \over 1 + e^{\beta_0+\beta_1 X}}
+\end{equation}
+
+While this may not look like it's linear, a simple algebraic manipulation can lead us to an equation that is linear in $X$:
+
+\begin{align}
+\begin{split}
+p(X) &= {e^{\beta_0+\beta_1 X} \over 1 + e^{\beta_0+\beta_1 X}} \\
+{p(X)\over 1 - p(X)} &= e^{\beta_0+\beta_1 X} \\
+log \bigg({p(X)\over 1 - p(X)} \bigg) &= \beta_0+\beta_1 X
+\end{split}
+(\#eq:logit)
+\end{align}
+
+The left hand side of the final form in formula \@ref(eq:logit) is often referred to as the log-odds since it is the log of the probability odds ($p(x)/1-p(x)$).
+
+Now that we've transformed the regression equation to give output values between 0 and 1, we need to define a new loss function to optimize for. While we could use the least squares loss to fit the model, that would be non-linear. A more general loss function used for logistic regression, is called the maximum likelihood, and is defined as follows:
+
+
+\begin{equation}
+\ell(\beta_0, \beta_1) = \prod_{i:y_1 = 1} p(x_i) \prod_{i':y_{i'}=0} (1 - p(x_{i'}))
+\end{equation}
+
+We choose $\beta_0$ and $\beta_1$ so that they maximize the likelihood function. 
+
+### Multiple Logistic Regression
+
+So far we have only considered a logistic regression with one predictor. What about multiple predictors? Just like with linear regression, we can easily generalize our logistic regression formula (\@ref(eq:logit)) to multiple predictors, as follows:
+
+\begin{align}
+log \bigg({p(X)\over 1 - p(X)} \bigg) &= \beta_0+\beta_1 X_1 + \dots + \beta_k X_k
+(\#eq:multilogit)
+\end{align}
+
+where $X = X_1, \dots X_k$ are $k$ predictors. Like in the previous section, we use the maximum likelihood to estimate $\beta_0, \beta_1, \dots, \beta_k$.
+
+Let's return to our previous example (figure \@ref(fig:groups)). Using logistic regression, we can correctly predict the class of all but 6 data points using .5 as the cutoff between the two classes (figure \@ref(fig:logistic-regression)).
+
+```{r logistic-regression, echo=F, fig.cap="The  true data classes vs. the predicted data classes"}
+glm(vs ~ disp + mpg, family =binomial(link = "logit"), mtcars) %>% 
+  broom::augment(type.predict = "response") %>% 
+  mutate(fit = ifelse(.fitted < .5, F, T)) %>%
+  ggplot(aes(mpg, disp, color = factor(vs), shape = fit)) + 
+  geom_point() +
+  labs(x ="x", y = "y", color = "groups", shape = "predicted groups") +
+  guides(color = guide_legend(override.aes = list(size = 3)),
+         shape = guide_legend(override.aes = list(size = 3))) +
+  theme(legend.position = c(.8, .7)) + 
+  scale_color_discrete(labels = c("group a", "group b")) +
+  scale_shape_discrete(labels = c("group a", "group b")) 
+```
+
+While an outcome of $.5$ might be the most natural default cutoff between the two classes, it is not always the right one. For example, looking at the probabilites of our example above (\@ref(fig:logistic-probs)), we can  clearly see that a lower value (perhaps $.25$) might be a better cutoff, giving us less error. On the other hand, such an approach might lead to overfitting the model to our training data.
+
+```{r logistic-probs, echo=F, fig.cap="The probabilites of each point given by logistic regression"}
+glm(vs ~ disp + mpg, family =binomial(link = "logit"), mtcars) %>% 
+  broom::augment(type.predict = "response") %>% 
+  ggplot(aes(mpg, disp, color = factor(vs))) + 
+  geom_point() +
+  ggrepel::geom_text_repel(aes(label = round(.fitted, 2)), size = 2) +
+  labs(x ="x", y = "y", color = "groups", shape = "predicted groups") +
+  guides(color = guide_legend(override.aes = list(size = 3))) +
+  theme(legend.position = c(.8, .9)) + 
+  scale_color_discrete(labels = c("group a", "group b")) 
+```
+
+### Categorical Predictors
+
+Like with linear regression (section \@ref(categorical)), categorical predictors can be used with logistic regression by using dummy variables to represent the categorical classes. The only difference is that the dummy variables won't change the predicted outcome itself, but the probability of the predicted outcome. The same is true when we interact the dummy variables with other (numerical) predictors. The effect of such interaction is changing the probability associated with the interacted predictor.
+
+
+### Multinomial Classes
+
+So far we have only discussed logistic regression in a situation where our outcome variable can only take two values or classes. But what about multiclass problems? multinomial logistic regression is not often used to predict more than a binary classification because much better methods are available. Nevertheless, generalizations to the logistic regression exist which allow using it for predicting more than two classes.
+
+The most simple generalization is to employ a technique similar to how we encode multinomial classes as predictors (see section \@ref(categorical)). For $k$ classes, we can run $k-1$ independent binary logistic regressions, where one outcome is used as a pivot against which all other classes are regressed. For example, if we choose outcome $k$ as our pivot, our set of logistic regression will take on the following form:
+
+\begin{align}
+\begin{split}
+log \bigg({p(\textrm{class 1}) \over p(\textrm{class k})} \bigg) &= B_1 X_i \\
+log \bigg({p(\textrm{class 2}) \over p(\textrm{class k})} \bigg) &= B_2 X_i \\
+\dots \\
+log \bigg({p(\textrm{class k-1}) \over p(\textrm{class k})} \bigg) &= B_{k-1} X_i
+\end{split}
+\end{align}
+
+We can then find the probabilites for class $k$, using the fact that the sum of all probabilites need to sum to 1:
+
+\begin{equation}
+p(k) = {1 \over {1 + \sum_{k=1}^{k-1}e^{\beta_k X_i}}}
+\end{equation}
+
+and for all other classes $1, 2, ..., k-1$ we can use the followin formula:
+
+\begin{equation}
+\begin{split}
+p(1) = {e^{\beta_1 X_i} \over 1 + \sum_{k=1}^{k-1} e^{\beta_k X_i}} \\
+p(2) = {e^{\beta_2 X_i} \over 1 + \sum_{k=1}^{k-1} e^{\beta_k X_i}} \\
+\dots \\
+p(k-1) = {e^{\beta_{k-1} X_i} \over 1 + \sum_{k=1}^{k-1} e^{\beta_k X_i}}
+\end{split}
+\end{equation}
+
 
 ## Naive Bayes
 
+Naive Bayes is a simple classification method that applies Bayes' theorem to the problem of classification. Recall that Bayes' theorem states as follows:
+
+
+
+```{theorem, label = bayes, name = "Bayes' theorem"}
+$$P(A|B) = {P(A \cap B)\over P(B)}$$
+
+```
+
+With some basic algebra it can be shown that $P(A \cap B) = P(A|B) P(B)$. Since we know that $P(A \cap B) = P(B \cap A)$, we can restate Bayes' theorem as in formula \@ref(eq:bayes).
+
+\begin{equation}
+P(A|B) = {P(A \cap B) \over P(B)} = {P(B|A)P(A) \over P(B)}
+(\#eq:bayes)
+\end{equation}
+
+
+If we know the prior probability of specific features given a classification, we can then estimate the probability of an observation's classification given the existence of those specific features. 
+
+As an example, suppose we're trying to find the probability that an incoming email is spam given that it contains the word "cash." If we know the prior probability of the word "cash" appearing in emails we have classified as spam, we can know calculate the probability of a new email being spam given that it contains the word "cash." In mathematical notation $P(\textrm{spam|cash}) = {P(\textrm{cash|spam})P(\textrm{spam})\over P(\textrm{cash})}$.
+
+The Naive Bayes classifier (formula \@ref(eq:naive-bayes)) takes advantage of our ability to compute prior probabilities, to estimate posterior probabilities for classification purposes. It's naive because it makes a naive assumption about the data it is fed, namely, that all of the features in the data are equally important and that they are all independent of each other. In our spam example, we will consider each word as equally indicative of spam or not spam and as independent of other words. While this assumptions are clearly not true in most cases, Naive Bayes still gives surprisingly well results.
+
+
+
+\begin{equation}
+P(C_L|F_1,F_2,...,F_n) = {1\over Z}p(C_L) {\prod_{i=1}^{n}p(F_i|C_L)}
+(\#eq:naive-bayes)
+\end{equation}
+
+
+## Linear Discriminant Analysis
+
+While logistic regression is great for predicting binary classes, it's harder to use and harder to interpert for multinomial classes. Logistic regression also suffers from other downsides among them the fact that if the classes are separated, the estimates for the predictor coefficients can be unstable. Linear discriminant analysis can be used to overcome these issues.
+
+Suppose we have observation that we want to classify into one of $K$ classes. 
+
+The basis for LDA is Bayes' theorem. 
+
 ## K-Nearest Neighbors
 
+K-nearest neighbors (k-NN in short) is a non-parametric classification method. k-NN classifiers use measures of distance between data points to assign them a class. By calculating the distance of a point from its $k$ closest neighbors, we can estimate the class of the point.
+
+### Distance functions
+
+For continuous variables, there are several distance functions. The most commonly used [@hu_huang_ke_tsai_2016] is the Euclidean distance function (formula \@ref(eq:euclidean-distance)), which gives the actual distance between two points in Euclidean space "as the crow flies".
+
+\begin{align}
+\begin{split}
+D(x,x') &= \sqrt{(x_1-x'_1)^2 + (x_2 - x'_2)^2 + \dots + (x_n - x'_n)^2} \\
+&= \sqrt{\sum_{i=1}^{n}(x_i-x'_i)^2} 
+\end{split}
+(\#eq:euclidean-distance)
+\end{align}
+
+
+The Euclidean distance function does not come without its downsides, however. One downside is that it's very sensitive to extreme differences in a single feature. So if one attribute (out of potentially many) of a neighboring point is larger, it will throw off the classification accuracy.
+
+Another commonly used distance function is the Manhattan distance function (formula \@ref(eq:manhattan-distance)), so called because it only uses horizontal and vertical distances between points. This alleviates the above mentioned downside to the Euclidean distance function because extreme differences in one attribute are not squared.
+
+\begin{align}
+\begin{split}
+D(x,x') &= |x_1-x'_1| + |x_2 - x'_2| + \dots + |x_n - x'_n| \\
+&= \sum_{i=1}^{n}{|x_i-x'_i|} 
+\end{split}
+(\#eq:manhattan-distance)
+\end{align}
+
+These distance functions can be generalized to what is known as the Malinowski distance function (formula \@ref(eq:minkowski-distance). When $q = 2$ the Malinowski distance is exactly equal to the Euclidean distance, and when $q = 1$ it is equal to the Manhattan distance. But you can also set $q$ to other values depending on how much extreme differences in single features need to be penalized.
+
+\begin{align}
+\begin{split}
+D(x,x') &= \sqrt[q]{(|x_1-x'_1|)^q + (|x_2 - x'_2|)^q + \dots + (|x_n - x'_n|)^q} \\
+&= \sum_{i=1}^{n}{\sqrt[q]{(|x_i-x'_i|)^q}}
+\end{split}
+(\#eq:minkowski-distance)
+\end{align}
+
+For discrete and categorical variables, the Euclidean distance and similar continuous distance functions are not at all informative, especially when there's no inherent ordering. In such cases, the Hamming distance (formula \@ref(eq:hamming-distance)) can be used. It should also be noted that the Malinowski distance function (formula \@ref(eq:minkowski-distance)) is equal to the Hamming distance when $q = 0$.
+
+\begin{equation}
+D(x,x') =  \sum_{i=1}^{n}{
+\begin{cases}
+   0 & \textrm{if } x_i \neq x'_i \\
+   1 & \textrm{if } x_i = x'_i
+   \end{cases}
+   }
+(\#eq:hamming-distance)
+\end{equation}
+
+### The classifier
+
+The simplest k-NN classifier is when $k = 1$, i.e. the 1-nearest neighbor classifier. Using the 1-NN, the class of a point $x$ is simply the class of its closest neighbor in the feature space as calculated by the appropriate distance function. 
+
+When $k = n$, the k-NN classifier devolves into a simple majority vote; each new data point will be assigned the class of the majority of already classified data points. To choose an appropriate $k$ various optimization techniques can be employed. 
+
+If the data is highly dimensional (with number of dimensions, or features, greater than ~10), dimension reduction can be done to lower the number of dimensions.
+
+# Clustering
+
+## K-Means
+
 # Regularlization
-Overfitting is a problem. regularlization penalizes biggest predictors. "Regularization can be accomplished by restricting the hypothesis space $\mathcal {H}$" 
+Over-fitting is a problem. regularization penalizes biggest predictors. "Regularization can be accomplished by restricting the hypothesis space $\mathcal {H}$" 
 
 ## Tikhonov regularization (Ridge Regression)
 
@@ -112,96 +602,25 @@ Overfitting is a problem. regularlization penalizes biggest predictors. "Regular
 ## Lasso Regression
 
 
+## The Curse of Dimensionality 
+
 ## Principal Components
-Dimensionality reduciton
+
+
+Dimensionality reduction
 
 # Reinforcment Learning
 
+So far, the statistical learning models we have discusses are used to either predict a numerical outcome or a categorical class. But there exists a third type of prediction that can not be modeled as a single predicted outcome, but rather as a series of steps that have to be taken to reach a specific goal. 
+
+The classical example of such type of problem is the multi-armed bandit problem, as presented by @gittins: a gambler with a selection of many slot machines to play has to decide which slot machine to choose, how many times to play each machine, and in which order, based on each machine's individual probability distribution. Put simply, the gambler needs to optimize the reward earned by the pulling of levers of the slot machines.
+
+@gittins presented a theorem, called the Gittins Index, which gives an optimal policy for the gambler to follow, which will maximize the reward. Ultimately, the gambler can play again and again using the information of wins and loses to decide which machine to play next. But so-called "exploitation" of the machine with the highest winning probabilities has a downside, exploration of the probabilities of other machines falls. The problem that reinforcement learning deals with is to optimize the tradeoff between exploration and exploitation.
+
+
+
 # Deep Learning
 
-This is a level 1 heading
-
-
-
-## Level 2
-
-Blah blah [se also @islr ch. 1] and @eslr.
-
-### equations
-This s an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. See equation \@ref(eq:sum) there's also \@ref(eq:sum2)
-
-\begin{equation} 
-  \sum_{i}^{x}5+1
-  (\#eq:sum)
-\end{equation} 
-
-
-\begin{equation} 
-  \sum_{i}^{x}5+5
-  (\#eq:sum2)
-\end{equation} 
-
-### Level 4
-
-```{theorem}
-Here is A theorem.
-```
-
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure,  echo=FALSE, fig.cap="test a caption"}
-library(ggplot2)
-ggplot(pressure, aes(temperature, pressure)) + geom_point()
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk \@ref(fig:pressure) to prevent printing of the R code that generated the plot. @pattern_recognition
-
-also, lets put this in here
-
-\begin{equation} 
-\begin{split}
-\mathrm{Var}(\hat{\beta}) & =\mathrm{Var}((X'X)^{-1}X'y)\\
- & =(X'X)^{-1}X'\mathrm{Var}(y)((X'X)^{-1}X')'\\
- & =(X'X)^{-1}X'\mathrm{Var}(y)X(X'X)^{-1}\\
- & =(X'X)^{-1}X'\sigma^{2}IX(X'X)^{-1}\\
- & =(X'X)^{-1}\sigma^{2}
-\end{split}
-(\#eq:var-beta)
-\end{equation} 
-
-
-and now lets referene \@ref(eq:var-beta) for god sake
-Note that the `echo = FALSE` parameter was added to the code chunk \@ref(fig:pressure) to prevent printing of the R code that generated the plot.
-
-Note that the `echo = FALSE` parameter was added to the code chunk \@ref(fig:pressure) to prevent printing of the R code that generated the plot.
-
-Note that the `echo = FALSE` parameter was added to the code chunk \@ref(fig:pressure) to prevent printing of the R code that generated the plot.
-Note that the `echo = FALSE` parameter was added to the code chunk \@ref(fig:pressure) to prevent printing of the R code that generated the plot.
-
-## level  chapeter
-
-fdsfdsf sdf
-fsd f
-sdf 
-sd
-f 
-sf
-
-# let's try  an ew cahpeter 
-
-\begin{equation} 
-\begin{split}
-\mathrm{Var}(\hat{\beta}) & =\mathrm{Var}((X'X)^{-1}X'y)\\
- & =(X'X)^{-1}X'\mathrm{Var}(y)((X'X)^{-1}X')'\\
- & =(X'X)^{-1}X'\mathrm{Var}(y)X(X'X)^{-1}\\
- & =(X'X)^{-1}X'\sigma^{2}IX(X'X)^{-1}\\
- & =(X'X)^{-1}\sigma^{2}
-\end{split}
-(\#eq:var-gamma)
-\end{equation} 
-trterter \@ref(eq:var-gamma)
+\pagebreak
 
 # References
